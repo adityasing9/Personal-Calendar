@@ -79,14 +79,11 @@ export async function initializeDatabase() {
     await db.festivals.bulkPut(INITIAL_FESTIVALS);
   }
 
-  // Only seed demo data if it has NEVER been initialized before
-  const settings = (await db.settings.get('default')) || DEFAULT_SETTINGS;
-  if (!settings.demoDataSeeded) {
-    const eventsCount = await db.events.count();
-    const tasksCount = await db.tasks.count();
-    if (eventsCount === 0 && tasksCount === 0) {
-      await seedDemoData();
-    }
+  // Only seed demo data on the VERY FIRST visit ever, never if user cleared or seeded before
+  const hasVisitedBefore = localStorage.getItem('life_calendar_initialized');
+  if (!hasVisitedBefore) {
+    localStorage.setItem('life_calendar_initialized', 'true');
+    await seedDemoData();
   }
 }
 
@@ -588,8 +585,12 @@ export async function clearAllUserData() {
   await db.reminders.clear();
   await db.notes.clear();
   await db.tags.clear();
-  await db.festivals.clear();
-  await db.festivals.bulkPut(INITIAL_FESTIVALS);
-  // Keep demoDataSeeded as true so clearing data stays cleared!
-  await db.settings.update('default', { demoDataSeeded: true });
+  // Ensure the app knows user explicitly cleared data
+  localStorage.setItem('life_calendar_initialized', 'true');
+  localStorage.setItem('life_calendar_cleared', 'true');
+  await db.settings.put({
+    ...DEFAULT_SETTINGS,
+    hasCompletedOnboarding: true,
+    demoDataSeeded: true
+  });
 }
