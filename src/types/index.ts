@@ -199,5 +199,6 @@ export interface UserSettings {
   aiProvider: 'local' | 'gemini' | 'openai';
   aiApiKey?: string;
   hasCompletedOnboarding: boolean;
+  demoDataSeeded?: boolean;
   lastCheckedDate: string;
 }

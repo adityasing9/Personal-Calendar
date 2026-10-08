@@ -64,12 +64,13 @@ export const DEFAULT_SETTINGS: UserSettings = {
   aiProvider: 'local',
   aiApiKey: '',
   hasCompletedOnboarding: false,
+  demoDataSeeded: false,
   lastCheckedDate: new Date().toISOString().split('T')[0]
 };
 
 export async function initializeDatabase() {
-  const settingsCount = await db.settings.count();
-  if (settingsCount === 0) {
+  const currentSettings = await db.settings.get('default');
+  if (!currentSettings) {
     await db.settings.put(DEFAULT_SETTINGS);
   }
 
@@ -78,11 +79,14 @@ export async function initializeDatabase() {
     await db.festivals.bulkPut(INITIAL_FESTIVALS);
   }
 
-  // Check if any personal data exists; if none, populate sample demo data
-  const eventsCount = await db.events.count();
-  const tasksCount = await db.tasks.count();
-  if (eventsCount === 0 && tasksCount === 0) {
-    await seedDemoData();
+  // Only seed demo data if it has NEVER been initialized before
+  const settings = (await db.settings.get('default')) || DEFAULT_SETTINGS;
+  if (!settings.demoDataSeeded) {
+    const eventsCount = await db.events.count();
+    const tasksCount = await db.tasks.count();
+    if (eventsCount === 0 && tasksCount === 0) {
+      await seedDemoData();
+    }
   }
 }
 
@@ -556,6 +560,9 @@ export async function seedDemoData() {
   await db.events.bulkPut(events);
   await db.shoppingItems.bulkPut(shopping);
   await db.notes.bulkPut(notes);
+
+  // Mark that demo data was seeded once
+  await db.settings.update('default', { demoDataSeeded: true });
 }
 
 export async function clearDemoData() {
@@ -567,6 +574,7 @@ export async function clearDemoData() {
   await db.exams.filter(e => !!e.isDemo).delete();
   await db.shoppingItems.filter(s => !!s.isDemo).delete();
   await db.notes.filter(n => !!n.isDemo).delete();
+  await db.settings.update('default', { demoDataSeeded: true });
 }
 
 export async function clearAllUserData() {
@@ -582,4 +590,6 @@ export async function clearAllUserData() {
   await db.tags.clear();
   await db.festivals.clear();
   await db.festivals.bulkPut(INITIAL_FESTIVALS);
+  // Keep demoDataSeeded as true so clearing data stays cleared!
+  await db.settings.update('default', { demoDataSeeded: true });
 }

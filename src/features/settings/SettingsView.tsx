@@ -106,6 +106,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     setShowClearConfirm(false);
     setConfirmPhrase('');
     onRefreshData();
+    alert('All local personal data, tasks, exams, and notes have been permanently cleared.');
   };
 
   return (
@@ -394,17 +395,29 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         ) : (
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800 space-y-3 text-xs">
             <p className="font-bold text-red-600">
-              Type "DELETE ALL DATA" below to confirm destruction:
+              Type <span className="font-mono bg-red-100 dark:bg-red-950/60 px-1.5 py-0.5 rounded">DELETE ALL DATA</span> below to confirm destruction:
             </p>
-            <input
-              type="text"
-              value={confirmPhrase}
-              onChange={(e) => setConfirmPhrase(e.target.value)}
-              placeholder="DELETE ALL DATA"
-              className="w-full px-3 py-2 rounded-xl border border-red-300 dark:border-red-800 font-mono text-xs text-red-600 focus:outline-hidden"
-            />
-            <div className="flex justify-end gap-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                autoFocus
+                value={confirmPhrase}
+                onChange={(e) => setConfirmPhrase(e.target.value)}
+                placeholder="DELETE ALL DATA"
+                className="flex-1 px-3 py-2 rounded-xl border border-red-300 dark:border-red-800 font-mono text-xs text-red-600 dark:text-red-400 bg-red-50/50 dark:bg-red-950/30 focus:outline-hidden"
+              />
               <button
+                type="button"
+                onClick={() => setConfirmPhrase('DELETE ALL DATA')}
+                className="px-2.5 py-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer"
+                title="Quick fill confirmation text"
+              >
+                Auto-fill
+              </button>
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
                 onClick={() => {
                   setShowClearConfirm(false);
                   setConfirmPhrase('');
@@ -414,9 +427,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleExecuteClearAll}
                 disabled={confirmPhrase.trim().toUpperCase() !== 'DELETE ALL DATA'}
-                className="px-4 py-1.5 font-bold bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white rounded-xl cursor-pointer"
+                className="px-4 py-1.5 font-bold bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl shadow-xs cursor-pointer transition-all"
               >
                 Confirm Delete
               </button>
