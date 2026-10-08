@@ -32,7 +32,7 @@ import { SettingsView } from './features/settings/SettingsView';
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
-  const [currentDate, setCurrentDate] = useState<Date>(new Date(2026, 9, 8)); // October 8, 2026
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   // Modals state
   const [isSearchOpen, setIsSearchOpen] = useState(false);

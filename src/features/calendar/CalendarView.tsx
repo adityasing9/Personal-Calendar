@@ -65,9 +65,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   onOpenQuickAdd,
   onRefreshData
 }) => {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date(2026, 9, 8)); // Oct 8, 2026
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<CalendarDisplayView>('month');
-  const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(new Date(2026, 9, 8));
+  const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(new Date());
   const [isDayDrawerOpen, setIsDayDrawerOpen] = useState(false);
 
   // Month interval calculation
@@ -372,21 +372,164 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       {/* ======================================================== */}
       {/* WEEK & DAY VIEWS */}
       {/* ======================================================== */}
-      {(viewMode === 'week' || viewMode === 'day') && (
-        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 p-6 text-center text-slate-500">
-          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-            {viewMode === 'day' ? formatDisplayDate(format(currentDate, 'yyyy-MM-dd')) : `Week of ${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d')}`}
-          </p>
-          <div className="mt-4 max-w-lg mx-auto text-left space-y-3">
-            {getItemsForDate(currentDate).events.map((e) => (
-              <div key={e.id} className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs flex justify-between">
-                <span className="font-bold text-blue-600">{e.startTime || 'All Day'}</span>
-                <span className="text-slate-900 dark:text-slate-100 font-medium">{e.title}</span>
+      {viewMode === 'day' && (
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 gap-2">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                {formatDisplayDate(format(currentDate, 'yyyy-MM-dd'))}
+              </h3>
+              {settings.showNepaliCalendar && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  {formatNepaliDisplay(currentDate)} ({getNepaliDate(currentDate).formattedShortEnglish})
+                </p>
+              )}
+            </div>
+            <button
+              onClick={() => onOpenQuickAdd('event', format(currentDate, 'yyyy-MM-dd'))}
+              className="self-start sm:self-auto px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+            >
+              + Add Item
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {/* Festivals */}
+            {getItemsForDate(currentDate).festivals.map((f) => (
+              <div key={f.id} className="p-3.5 rounded-2xl bg-orange-50/70 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-orange-700 dark:text-orange-400">Festival</span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{f.name}</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">{f.description}</p>
+                </div>
+                {f.isHoliday && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-500 text-white">Holiday</span>}
               </div>
             ))}
-            {getItemsForDate(currentDate).events.length === 0 && (
-              <div className="p-4 text-center text-xs text-slate-400">No events on this day.</div>
+
+            {/* Exams */}
+            {getItemsForDate(currentDate).exams.map((ex) => (
+              <div key={ex.id} className="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-rose-700 dark:text-rose-400">Exam ({ex.type})</span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{ex.room ? `Room: ${ex.room}` : 'Scheduled'}</h4>
+                  {ex.syllabus && <p className="text-xs text-slate-500 mt-0.5">{ex.syllabus}</p>}
+                </div>
+                <span className="text-xs font-bold text-rose-600">{ex.startTime || 'Time TBA'}</span>
+              </div>
+            ))}
+
+            {/* Events */}
+            {getItemsForDate(currentDate).events.map((e) => (
+              <div key={e.id} className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-blue-700 dark:text-blue-400">{e.category}</span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{e.title}</h4>
+                  {e.location && <p className="text-xs text-slate-400 mt-0.5">📍 {e.location}</p>}
+                </div>
+                <span className="text-xs font-bold text-blue-600">{e.startTime || 'All Day'}</span>
+              </div>
+            ))}
+
+            {/* Tasks */}
+            {getItemsForDate(currentDate).tasks.map((t) => (
+              <div key={t.id} className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400">Task Due</span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{t.title}</h4>
+                </div>
+                <span className="text-xs font-bold text-amber-600 uppercase">{t.priority}</span>
+              </div>
+            ))}
+
+            {/* Shopping */}
+            {getItemsForDate(currentDate).shopping.map((s) => (
+              <div key={s.id} className="p-3.5 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-purple-700 dark:text-purple-400">Shopping</span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{s.name}</h4>
+                </div>
+                {s.estimatedPrice && <span className="text-xs font-bold text-purple-600">${s.estimatedPrice}</span>}
+              </div>
+            ))}
+
+            {getItemsForDate(currentDate).totalCount === 0 && (
+              <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                No items or events scheduled for this day.
+              </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {viewMode === 'week' && (
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 p-5 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              Week of {format(startDate, 'MMM d')} – {format(endDate, 'MMM d, yyyy')}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-7 gap-3">
+            {eachDayOfInterval({ start: startDate, end: endDate }).map((day) => {
+              const dayItems = getItemsForDate(day);
+              const isDayToday = isToday(day);
+              const nep = getNepaliDate(day);
+
+              return (
+                <div
+                  key={day.toISOString()}
+                  onClick={() => {
+                    setSelectedDayDate(day);
+                    setIsDayDrawerOpen(true);
+                  }}
+                  className={`p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between min-h-[140px] ${
+                    isDayToday
+                      ? 'bg-blue-50/60 dark:bg-blue-950/30 border-blue-300 dark:border-blue-700'
+                      : 'bg-white dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/60 hover:border-slate-300'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className={`text-xs font-bold ${isDayToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-slate-100'}`}>
+                        {format(day, 'EEE d')}
+                      </span>
+                      {settings.showNepaliCalendar && (
+                        <span className="text-[10px] text-slate-400">
+                          {nep.formattedShortNepali}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-1">
+                      {dayItems.festivals.slice(0, 1).map((f) => (
+                        <div key={f.id} className="text-[10px] font-semibold truncate px-1 py-0.5 rounded bg-orange-100 dark:bg-orange-950/50 text-orange-800 dark:text-orange-300">
+                          🎉 {f.name}
+                        </div>
+                      ))}
+                      {dayItems.exams.slice(0, 1).map((ex) => (
+                        <div key={ex.id} className="text-[10px] font-bold truncate px-1 py-0.5 rounded bg-rose-100 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300">
+                          🎓 {ex.type}
+                        </div>
+                      ))}
+                      {dayItems.events.slice(0, 2).map((e) => (
+                        <div key={e.id} className="text-[10px] font-medium truncate px-1 py-0.5 rounded bg-blue-100/70 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300">
+                          {e.startTime || '•'} {e.title}
+                        </div>
+                      ))}
+                      {dayItems.tasks.slice(0, 2).map((t) => (
+                        <div key={t.id} className="text-[10px] font-medium truncate px-1 py-0.5 rounded bg-emerald-100/70 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300">
+                          ✓ {t.title}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-2 pt-1 border-t border-slate-100 dark:border-slate-700/50 text-[10px] text-slate-400">
+                    {dayItems.totalCount} item(s)
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

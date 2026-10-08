@@ -158,9 +158,24 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
           });
         }
       } else if (selectedType === 'exam') {
+        let subIdToUse = selectedSubjectId;
+        if (!subIdToUse && subjects.length > 0) {
+          subIdToUse = subjects[0].id;
+        } else if (!subIdToUse) {
+          // If no subjects exist in DB, dynamically create a General Studies subject
+          const autoSubId = `sub-general-${Date.now()}`;
+          await db.subjects.put({
+            id: autoSubId,
+            name: 'General Course',
+            code: 'GEN101',
+            createdAt: now
+          });
+          subIdToUse = autoSubId;
+        }
+
         await db.exams.put({
           id,
-          subjectId: selectedSubjectId || (subjects[0]?.id ?? 'sub-dbms'),
+          subjectId: subIdToUse,
           type: examType,
           date,
           startTime: time || '10:00',
@@ -357,17 +372,23 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
                     Subject
                   </label>
-                  <select
-                    value={selectedSubjectId}
-                    onChange={(e) => setSelectedSubjectId(e.target.value)}
-                    className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
-                  >
-                    {subjects.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name} ({s.code})
-                      </option>
-                    ))}
-                  </select>
+                  {subjects.length > 0 ? (
+                    <select
+                      value={selectedSubjectId}
+                      onChange={(e) => setSelectedSubjectId(e.target.value)}
+                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    >
+                      {subjects.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} ({s.code})
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="text-[11px] text-slate-500 italic p-1 border rounded-lg border-dashed">
+                      Will auto-create a subject if none exists
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
