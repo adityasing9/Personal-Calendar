@@ -1,0 +1,1 @@
+{"name":"Personal Life Calendar","short_name":"LifeOS","description":"Personal command center for events, college, tasks, deadlines, and festivals","start_url":"./","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","lang":"en","scope":"./","orientation":"portrait","icons":[{"src":"favicon.svg","sizes":"any","type":"image/svg+xml"}]}
