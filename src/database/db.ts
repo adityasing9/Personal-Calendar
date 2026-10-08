@@ -64,7 +64,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   aiProvider: 'local',
   aiApiKey: '',
   hasCompletedOnboarding: false,
-  lastCheckedDate: '2026-10-08'
+  lastCheckedDate: new Date().toISOString().split('T')[0]
 };
 
 export async function initializeDatabase() {
@@ -87,7 +87,26 @@ export async function initializeDatabase() {
 }
 
 export async function seedDemoData() {
-  const now = new Date().toISOString();
+  const now = new Date();
+  const nowIso = now.toISOString();
+
+  // Helper to generate dynamic YYYY-MM-DD relative to today
+  const addDays = (days: number): string => {
+    const d = new Date(now);
+    d.setDate(d.getDate() + days);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayStr = addDays(0);
+  const twoDaysAgoStr = addDays(-2);
+  const tomorrowStr = addDays(1);
+  const inTwoDaysStr = addDays(2);
+  const inFiveDaysStr = addDays(5);
+  const inSevenDaysStr = addDays(7);
+  const inFourteenDaysStr = addDays(14);
 
   // Subjects
   const subjects: Subject[] = [
@@ -100,7 +119,7 @@ export async function seedDemoData() {
       credits: 4,
       notes: 'Focus on Relational Algebra, SQL, Normalization, ACID and 2PL protocols.',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'sub-ai',
@@ -111,7 +130,7 @@ export async function seedDemoData() {
       credits: 4,
       notes: 'Heuristic Search, Alpha-Beta Pruning, Vector Embeddings and RAG.',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'sub-daa',
@@ -122,7 +141,7 @@ export async function seedDemoData() {
       credits: 3,
       notes: 'Greedy methods, Dynamic Programming, NP-Completeness.',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'sub-os',
@@ -133,7 +152,7 @@ export async function seedDemoData() {
       credits: 3,
       notes: 'Memory virtualization, paging, process synchronization, semaphores.',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     }
   ];
 
@@ -143,7 +162,7 @@ export async function seedDemoData() {
       id: 'exam-dbms-ia3',
       subjectId: 'sub-dbms',
       type: 'IA',
-      date: '2026-10-14',
+      date: inFiveDaysStr,
       startTime: '10:00',
       endTime: '11:30',
       room: 'LH-302',
@@ -152,13 +171,13 @@ export async function seedDemoData() {
       preparationStatus: 'revising',
       priority: 'critical',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'exam-ai-review',
       subjectId: 'sub-ai',
       type: 'Presentation',
-      date: '2026-10-16',
+      date: inSevenDaysStr,
       startTime: '14:00',
       endTime: '16:00',
       room: 'CS Lab 4',
@@ -167,13 +186,13 @@ export async function seedDemoData() {
       preparationStatus: 'revising',
       priority: 'high',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'exam-daa-lab',
       subjectId: 'sub-daa',
       type: 'Lab',
-      date: '2026-10-23',
+      date: inFourteenDaysStr,
       startTime: '09:30',
       endTime: '12:30',
       room: 'Algorithm Lab 2',
@@ -181,7 +200,7 @@ export async function seedDemoData() {
       preparationStatus: 'not_started',
       priority: 'medium',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     }
   ];
 
@@ -191,29 +210,29 @@ export async function seedDemoData() {
       id: 'proj-studyai',
       name: 'StudyAI',
       description: 'Intelligent multi-modal study assistant with RAG pipelines and vector search.',
-      startDate: '2026-09-01',
-      deadline: '2026-10-18',
+      startDate: addDays(-30),
+      deadline: inSevenDaysStr,
       status: 'active',
       progress: 72,
       priority: 'critical',
       tags: ['ai', 'rag', 'fullstack'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'proj-autoflow',
       name: 'AutoFlow',
       description: 'Lightweight local task automation orchestrator.',
-      startDate: '2026-09-20',
-      deadline: '2026-11-05',
+      startDate: addDays(-15),
+      deadline: addDays(25),
       status: 'planning',
       progress: 25,
       priority: 'medium',
       tags: ['automation', 'open-source'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     }
   ];
 
@@ -224,9 +243,9 @@ export async function seedDemoData() {
       title: 'UI Design & Interactive Prototype',
       status: 'completed',
       progress: 100,
-      dueDate: '2026-09-15',
+      dueDate: addDays(-20),
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'ms-auth',
@@ -234,9 +253,9 @@ export async function seedDemoData() {
       title: 'Authentication & Session Store',
       status: 'completed',
       progress: 100,
-      dueDate: '2026-09-22',
+      dueDate: addDays(-14),
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'ms-doc-upload',
@@ -244,9 +263,9 @@ export async function seedDemoData() {
       title: 'Document Upload & Parsing',
       status: 'completed',
       progress: 100,
-      dueDate: '2026-09-30',
+      dueDate: addDays(-7),
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'ms-embeddings',
@@ -254,9 +273,9 @@ export async function seedDemoData() {
       title: 'Embeddings Indexing Pipeline',
       status: 'completed',
       progress: 100,
-      dueDate: '2026-10-04',
+      dueDate: addDays(-3),
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'ms-rag-test',
@@ -264,9 +283,9 @@ export async function seedDemoData() {
       title: 'RAG Testing & Evaluation',
       status: 'pending',
       progress: 60,
-      dueDate: '2026-10-12',
+      dueDate: inTwoDaysStr,
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'ms-deploy',
@@ -274,9 +293,9 @@ export async function seedDemoData() {
       title: 'Deployment & Staging Launch',
       status: 'pending',
       progress: 0,
-      dueDate: '2026-10-16',
+      dueDate: inFiveDaysStr,
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'ms-docs',
@@ -284,9 +303,9 @@ export async function seedDemoData() {
       title: 'StudyAI Architecture Documentation',
       status: 'pending',
       progress: 30,
-      dueDate: '2026-10-06',
+      dueDate: twoDaysAgoStr,
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     }
   ];
 
@@ -296,24 +315,24 @@ export async function seedDemoData() {
       id: 'task-doc-overdue',
       title: 'Finish StudyAI documentation',
       description: 'Complete architecture diagrams, API specs, and prompt engineering evaluation notes.',
-      dueDate: '2026-10-06',
+      dueDate: twoDaysAgoStr,
       dueTime: '18:00',
       priority: 'critical',
       status: 'overdue',
       category: 'project',
       projectId: 'proj-studyai',
-      originalDueDate: '2026-10-06',
+      originalDueDate: twoDaysAgoStr,
       carriedForward: false,
       tags: ['documentation', 'urgent'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'task-dbms-assignment',
       title: 'DBMS assignment - Concurrency & Transactions',
       description: 'Submit PDF with serializability schedule solutions on college portal.',
-      dueDate: '2026-10-08',
+      dueDate: todayStr,
       dueTime: '23:59',
       priority: 'critical',
       status: 'not_started',
@@ -321,14 +340,14 @@ export async function seedDemoData() {
       subjectId: 'sub-dbms',
       tags: ['assignment', 'college'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'task-ai-review-prep',
       title: 'AI project review preparation',
       description: 'Draft the evaluation metrics and demo slide deck with team.',
-      dueDate: '2026-10-09',
+      dueDate: tomorrowStr,
       dueTime: '10:00',
       priority: 'high',
       status: 'in_progress',
@@ -337,14 +356,14 @@ export async function seedDemoData() {
       subjectId: 'sub-ai',
       tags: ['ai', 'presentation'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'task-dbms-prep',
       title: 'DBMS preparation & 2PL numericals',
       description: 'Solve past 3 years IA question papers.',
-      dueDate: '2026-10-10',
+      dueDate: inTwoDaysStr,
       dueTime: '20:00',
       priority: 'high',
       status: 'not_started',
@@ -352,22 +371,22 @@ export async function seedDemoData() {
       subjectId: 'sub-dbms',
       tags: ['exam-prep'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'task-daa-set',
       title: 'DAA dynamic programming problem set',
       description: 'Solve 0/1 Knapsack and Matrix Chain Multiplication proofs.',
-      dueDate: '2026-10-13',
+      dueDate: inFiveDaysStr,
       priority: 'medium',
       status: 'not_started',
       category: 'college',
       subjectId: 'sub-daa',
       tags: ['homework'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     }
   ];
 
@@ -377,7 +396,7 @@ export async function seedDemoData() {
       id: 'event-college-lecture',
       title: 'College: Database Systems Lecture',
       description: 'In-depth session on Two-Phase Locking and Deadlock handling.',
-      startDate: '2026-10-08',
+      startDate: todayStr,
       startTime: '09:00',
       endTime: '11:00',
       allDay: false,
@@ -387,14 +406,14 @@ export async function seedDemoData() {
       location: 'Lecture Hall 302',
       recurrence: 'none',
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'event-studyai-work',
       title: 'StudyAI Engineering Work Session',
       description: 'Debug retrieval latency and test re-ranking algorithm.',
-      startDate: '2026-10-08',
+      startDate: todayStr,
       startTime: '11:30',
       endTime: '13:30',
       allDay: false,
@@ -404,14 +423,14 @@ export async function seedDemoData() {
       location: 'CS Innovation Hub',
       recurrence: 'none',
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'event-dbms-prep',
       title: 'DBMS preparation & revision',
       description: 'Review transaction state diagrams and strict 2PL.',
-      startDate: '2026-10-08',
+      startDate: todayStr,
       startTime: '17:00',
       endTime: '18:30',
       allDay: false,
@@ -421,14 +440,14 @@ export async function seedDemoData() {
       location: 'Library Quiet Room',
       recurrence: 'none',
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'event-buy-usb',
       title: 'Buy USB cable & desk supplies',
       description: 'Pick up braided Type-C cable and sticky notes.',
-      startDate: '2026-10-08',
+      startDate: todayStr,
       startTime: '20:00',
       endTime: '20:30',
       allDay: false,
@@ -438,13 +457,13 @@ export async function seedDemoData() {
       location: 'Electronics Arcade',
       recurrence: 'none',
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'event-ai-review-sync',
       title: 'AI Project Review with Faculty',
-      startDate: '2026-10-09',
+      startDate: tomorrowStr,
       startTime: '10:00',
       endTime: '11:00',
       allDay: false,
@@ -454,8 +473,8 @@ export async function seedDemoData() {
       location: 'Dept Conference Room',
       recurrence: 'none',
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     }
   ];
 
@@ -467,13 +486,13 @@ export async function seedDemoData() {
       quantity: '1',
       category: 'Electronics',
       priority: 'urgent',
-      targetDate: '2026-10-08',
+      targetDate: todayStr,
       estimatedPrice: 15,
       actualPrice: 15,
       status: 'pending',
       notes: 'Need for high-speed device testing and charging today.',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'shop-stand',
@@ -481,12 +500,12 @@ export async function seedDemoData() {
       quantity: '1',
       category: 'Workstation',
       priority: 'soon',
-      targetDate: '2026-10-12',
+      targetDate: inFiveDaysStr,
       estimatedPrice: 35,
       status: 'pending',
       notes: 'Aluminium foldable stand for library study sessions.',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     },
     {
       id: 'shop-ssd',
@@ -499,7 +518,7 @@ export async function seedDemoData() {
       status: 'pending',
       notes: 'For storing local LLM weights and vector databases.',
       isDemo: true,
-      createdAt: now
+      createdAt: nowIso
     }
   ];
 
@@ -513,8 +532,8 @@ export async function seedDemoData() {
       linkedId: 'exam-dbms-ia3',
       tags: ['dbms', 'revision'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     },
     {
       id: 'note-studyai-arch',
@@ -524,8 +543,8 @@ export async function seedDemoData() {
       linkedId: 'proj-studyai',
       tags: ['architecture'],
       isDemo: true,
-      createdAt: now,
-      updatedAt: now
+      createdAt: nowIso,
+      updatedAt: nowIso
     }
   ];
 
