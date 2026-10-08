@@ -78,13 +78,7 @@ export async function initializeDatabase() {
   if (festivalsCount === 0) {
     await db.festivals.bulkPut(INITIAL_FESTIVALS);
   }
-
-  // Only seed demo data on the VERY FIRST visit ever, never if user cleared or seeded before
-  const hasVisitedBefore = localStorage.getItem('life_calendar_initialized');
-  if (!hasVisitedBefore) {
-    localStorage.setItem('life_calendar_initialized', 'true');
-    await seedDemoData();
-  }
+  // NEVER automatically seed demo data on startup!
 }
 
 export async function seedDemoData() {

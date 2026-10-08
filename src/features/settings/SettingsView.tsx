@@ -107,6 +107,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     setConfirmPhrase('');
     onRefreshData();
     alert('All local personal data, tasks, exams, and notes have been permanently cleared.');
+    window.location.reload();
   };
 
   return (
